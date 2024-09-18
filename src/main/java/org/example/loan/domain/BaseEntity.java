@@ -13,7 +13,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
+import static com.fasterxml.jackson.annotation.JsonInclude.*;
+
+@JsonInclude(Include.NON_NULL)
 @Getter
 @Setter
 @MappedSuperclass
