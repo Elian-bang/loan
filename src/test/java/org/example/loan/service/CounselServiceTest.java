@@ -1,14 +1,10 @@
 package org.example.loan.service;
 
-import static org.example.loan.dto.CounselDTO.*;
-import static org.mockito.Mockito.when;
-import static org.assertj.core.api.Assertions.assertThat;
-
-import org.junit.jupiter.api.Assertions;
 import org.example.loan.domain.Counsel;
 import org.example.loan.exception.BaseException;
 import org.example.loan.exception.ResultType;
 import org.example.loan.repository.CounselRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -19,6 +15,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
 import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.example.loan.dto.CounselDTO.Request;
+import static org.example.loan.dto.CounselDTO.Response;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class CounselServiceTest {
@@ -105,5 +106,21 @@ public class CounselServiceTest {
 
         assertThat(actual.getCounselId()).isSameAs(findId);
         assertThat(actual.getName()).isSameAs(request.getName());
+    }
+
+    @Test
+    void Should_DeletedCounselEntity_WhenRequestDeleteExistCounselInfo() {
+        Long targetId = 1L;
+
+        Counsel entity = Counsel.builder()
+                .counselId(1L)
+                .build();
+
+        when(counselRepository.save(ArgumentMatchers.any(Counsel.class))).thenReturn(entity);
+        when(counselRepository.findById(targetId)).thenReturn(Optional.ofNullable(entity));
+
+        counselService.delete(targetId);
+
+        assertThat(entity.getIsDeleted()).isSameAs(true);
     }
 }
