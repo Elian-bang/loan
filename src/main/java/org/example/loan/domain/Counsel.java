@@ -9,14 +9,14 @@ import org.hibernate.annotations.Where;
 import java.time.LocalDateTime;
 
 @Entity
-@Setter
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @DynamicInsert
 @DynamicUpdate
-@Where(clause = "is_delete=false")
+@Where(clause = "is_deleted=false")
 public class Counsel extends BaseEntity {
 
     @Id
