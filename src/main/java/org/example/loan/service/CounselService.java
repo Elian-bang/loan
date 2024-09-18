@@ -1,0 +1,8 @@
+package org.example.loan.service;
+
+import static org.example.loan.dto.CounselDTO.*;
+
+public interface CounselService {
+
+    Response create(Request request);
+}
