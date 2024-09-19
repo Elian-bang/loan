@@ -1,7 +1,6 @@
 package org.example.loan.service;
 
-import org.example.loan.dto.ApplicationDTO.Request;
-import org.example.loan.dto.ApplicationDTO.Response;
+import org.example.loan.dto.ApplicationDTO.*;
 
 public interface ApplicationService {
 
@@ -13,4 +12,5 @@ public interface ApplicationService {
 
     void delete(Long applicationId);
 
+    Boolean acceptTerms(Long applicationId, AcceptTerms request);
 }
