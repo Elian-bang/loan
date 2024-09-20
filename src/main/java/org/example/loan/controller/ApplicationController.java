@@ -3,7 +3,12 @@ package org.example.loan.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.loan.dto.ResponseDTO;
 import org.example.loan.service.ApplicationService;
+import org.example.loan.service.FileStorageService;
+import org.modelmapper.ModelMapper;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 import static org.example.loan.dto.ApplicationDTO.*;
 
@@ -13,6 +18,7 @@ import static org.example.loan.dto.ApplicationDTO.*;
 public class ApplicationController extends AbstractController {
 
     private final ApplicationService applicationService;
+    private final FileStorageService fileStorageService;
 
 
     @PostMapping
@@ -39,5 +45,11 @@ public class ApplicationController extends AbstractController {
     @PostMapping("/{applicationId}/terms")
     public ResponseDTO<Boolean> acceptTerms(@PathVariable Long applicationId, @RequestBody AcceptTerms request) {
         return ok(applicationService.acceptTerms(applicationId, request));
+    }
+
+    @PostMapping("/files")
+    public ResponseDTO<Void> upload(MultipartFile file) throws IllegalStateException, IOException {
+        fileStorageService.save(file);
+        return ok();
     }
 }
