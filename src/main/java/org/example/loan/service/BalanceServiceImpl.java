@@ -23,15 +23,18 @@ public class BalanceServiceImpl implements BalanceService {
 
     @Override
     public Response create(Long applicationId, CreateRequest request) {
-        if (balanceRepository.findByApplicationId(applicationId).isPresent()) {
-            throw new BaseException(ResultType.SYSTEM_ERROR);
-        }
-
         Balance balance = modelMapper.map(request, Balance.class);
 
         BigDecimal entryAmount = request.getEntryAmount();
         balance.setApplicationId(applicationId);
         balance.setBalance(entryAmount);
+
+        balanceRepository.findByApplicationId(applicationId).ifPresent(b -> {
+            balance.setBalanceId(b.getBalanceId());
+            balance.setIsDeleted(b.getIsDeleted());
+            balance.setCreatedAt(b.getCreatedAt());
+            balance.setCreatedAt(b.getUpdatedAt());
+        });
 
         Balance saved = balanceRepository.save(balance);
 
