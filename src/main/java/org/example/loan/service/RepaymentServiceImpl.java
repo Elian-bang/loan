@@ -6,6 +6,7 @@ import org.example.loan.domain.Entry;
 import org.example.loan.domain.Repayment;
 import org.example.loan.dto.BalanceDTO;
 import org.example.loan.dto.BalanceDTO.RepaymentRequest.RepaymentType;
+import org.example.loan.dto.RepaymentDTO.ListResponse;
 import org.example.loan.dto.RepaymentDTO.Request;
 import org.example.loan.dto.RepaymentDTO.Response;
 import org.example.loan.exception.BaseException;
@@ -16,7 +17,9 @@ import org.example.loan.repository.RepaymentRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +36,7 @@ public class RepaymentServiceImpl implements RepaymentService {
         // validation
         // 1. 계약을 완료한 신청 정보
         // 2. 집행이 되어있어야 함
-        if(!isRepayableApplication(applicationId)) {
+        if (!isRepayableApplication(applicationId)) {
             throw new BaseException(ResultType.SYSTEM_ERROR);
         }
 
@@ -53,12 +56,19 @@ public class RepaymentServiceImpl implements RepaymentService {
         return response;
     }
 
+    @Override
+    public List<ListResponse> get(Long applicationId) {
+        List<Repayment> repayments = repaymentRepository.findAllByApplicationId(applicationId);
+
+        return repayments.stream().map(r -> modelMapper.map(r, ListResponse.class)).collect(Collectors.toList());
+    }
+
     private boolean isRepayableApplication(Long applicationId) {
         Optional<Application> application = applicationRepository.findById(applicationId);
 
-        if(application.isEmpty()) {
+        if (application.isEmpty()) {
             return false;
-        }else if(application.get().getContractedAt() == null) {
+        } else if (application.get().getContractedAt() == null) {
             return false;
         }
 
