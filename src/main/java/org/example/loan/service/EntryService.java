@@ -7,4 +7,6 @@ public interface EntryService {
 
     Response create(Long applicationId, Request object);
 
+    Response get(Long applicationId);
+
 }
