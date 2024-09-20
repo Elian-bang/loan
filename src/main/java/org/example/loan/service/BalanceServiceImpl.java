@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.loan.domain.Balance;
 import org.example.loan.dto.BalanceDTO.CreateRequest;
 import org.example.loan.dto.BalanceDTO.Response;
+import org.example.loan.dto.BalanceDTO.UpdateRequest;
 import org.example.loan.exception.BaseException;
 import org.example.loan.exception.ResultType;
 import org.example.loan.repository.BalanceRepository;
@@ -11,7 +12,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +23,7 @@ public class BalanceServiceImpl implements BalanceService {
 
     @Override
     public Response create(Long applicationId, CreateRequest request) {
-        if(balanceRepository.findByApplicationId(applicationId).isPresent()) {
+        if (balanceRepository.findByApplicationId(applicationId).isPresent()) {
             throw new BaseException(ResultType.SYSTEM_ERROR);
         }
 
@@ -36,5 +36,23 @@ public class BalanceServiceImpl implements BalanceService {
         Balance saved = balanceRepository.save(balance);
 
         return modelMapper.map(saved, Response.class);
+    }
+
+    @Override
+    public Response update(Long applicationId, UpdateRequest request) {
+        // balance
+        Balance balance = balanceRepository.findByApplicationId(applicationId)
+                .orElseThrow(() -> new BaseException(ResultType.SYSTEM_ERROR));
+
+        // change
+        BigDecimal beforeEntryAmount = request.getBeforeEntryAmount();
+        BigDecimal afterEntryAmount = request.getAfterEntryAmount();
+        BigDecimal updatedBalance = balance.getBalance();
+
+        updatedBalance = updatedBalance.subtract(beforeEntryAmount).add(afterEntryAmount);
+        balance.setBalance(updatedBalance);
+        Balance updated = balanceRepository.save(balance);
+
+        return modelMapper.map(updated, Response.class);
     }
 }
