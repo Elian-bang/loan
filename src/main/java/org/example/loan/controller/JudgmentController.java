@@ -31,4 +31,9 @@ public class JudgmentController {
         return ok(judgmentService.getJudgmentOfApplication(applicationId));
     }
 
+    @PutMapping("/{judgmentId}")
+    public ResponseDTO<Response> update(@PathVariable Long judgmentId, @RequestBody Request request) {
+        return ok(judgmentService.update(judgmentId, request));
+    }
+
 }
