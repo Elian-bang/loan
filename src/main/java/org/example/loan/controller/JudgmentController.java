@@ -36,4 +36,10 @@ public class JudgmentController {
         return ok(judgmentService.update(judgmentId, request));
     }
 
+    @DeleteMapping("/{judgmentId}")
+    public ResponseDTO<Response> delete(@PathVariable Long judgmentId) {
+        judgmentService.delete(judgmentId);
+        return ok();
+    }
+
 }
