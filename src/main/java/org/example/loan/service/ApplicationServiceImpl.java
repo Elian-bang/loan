@@ -2,17 +2,20 @@ package org.example.loan.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.loan.domain.Application;
+import org.example.loan.domain.Judgment;
 import org.example.loan.domain.Terms;
 import org.example.loan.dto.ApplicationDTO;
 import org.example.loan.exception.BaseException;
 import org.example.loan.exception.ResultType;
 import org.example.loan.repository.AcceptTermsRepository;
 import org.example.loan.repository.ApplicationRepository;
+import org.example.loan.repository.JudgmentRepository;
 import org.example.loan.repository.TermsRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;
@@ -27,10 +30,12 @@ public class ApplicationServiceImpl implements ApplicationService {
     private final ApplicationRepository applicationRepository;
 
     private final TermsRepository termsRepository;
-    ;
 
     private final ModelMapper modelMapper;
+
     private final AcceptTermsRepository acceptTermsRepository;
+
+    private final JudgmentRepository judgmentRepository;
 
     @Override
     public Response create(Request request) {
@@ -94,7 +99,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         List<Long> termsIdes = termsList.stream().map(Terms::getTermsId).toList();
         Collections.sort(acceptTermsIds);
 
-        if(!new HashSet<>(termsIdes).containsAll(acceptTermsIds)) {
+        if (!new HashSet<>(termsIdes).containsAll(acceptTermsIds)) {
             throw new BaseException(ResultType.SYSTEM_ERROR);
         }
 
@@ -108,6 +113,28 @@ public class ApplicationServiceImpl implements ApplicationService {
         }
 
         return true;
+    }
+
+    @Override
+    public Response contract(Long applicationId) {
+        // 신청 정보 확인
+        Application application = applicationRepository.findById(applicationId)
+                .orElseThrow(() -> new BaseException(ResultType.SYSTEM_ERROR));
+
+        // 심사 정보 확인
+        Judgment judgment = judgmentRepository.findByApplicationId(applicationId)
+                .orElseThrow(() -> new BaseException(ResultType.SYSTEM_ERROR));
+
+        // 승인 금액 > 0
+        if(application.getApprovalAmount() == null || application.getApprovalAmount().compareTo(BigDecimal.ZERO) == 0) {
+            throw new BaseException(ResultType.SYSTEM_ERROR);
+        }
+
+        // 계약 체결
+        application.setContractedAt(LocalDateTime.now());
+        applicationRepository.save(application);
+
+        return modelMapper.map(application, Response.class);
     }
 
 }
