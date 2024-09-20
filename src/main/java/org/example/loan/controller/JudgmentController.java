@@ -1,6 +1,7 @@
 package org.example.loan.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.loan.dto.ApplicationDTO.GrantAmount;
 import org.example.loan.dto.JudgmentDTO.Request;
 import org.example.loan.dto.JudgmentDTO.Response;
 import org.example.loan.dto.ResponseDTO;
@@ -40,6 +41,11 @@ public class JudgmentController {
     public ResponseDTO<Response> delete(@PathVariable Long judgmentId) {
         judgmentService.delete(judgmentId);
         return ok();
+    }
+
+    @PutMapping("/{judgmentId}/grants")
+    public ResponseDTO<GrantAmount> grant(@PathVariable Long judgmentId) {
+        return ok(judgmentService.grant(judgmentId));
     }
 
 }
