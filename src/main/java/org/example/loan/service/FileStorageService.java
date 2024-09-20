@@ -14,4 +14,6 @@ public interface FileStorageService {
 
     Stream<Path> loadAll();
 
+    void deleteAll();
+
 }
